@@ -1,10 +1,13 @@
 import socket
+import struct
 import threading
 import time
 
 from logger import Log
 
 log = Log("tcp_server")
+
+
 class TCPServer:
     def __init__(self, host='0.0.0.0', port=5001):
         self.host = host
@@ -21,8 +24,7 @@ class TCPServer:
         while True:
             client_socket, client_address = self.server_socket.accept()
             log.info(f"New connection from {client_address}")
-            client_id = client_socket.recv(1024).decode('utf-8')
-
+            client_id = self._process_recv(client_socket).decode('utf-8')
             client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_id))
             client_thread.start()
 
@@ -39,11 +41,44 @@ class TCPServer:
         log.debug(f"Getting client list")
         return list(self.client_list.keys())
 
+    @staticmethod
+    def _preprocess_send(message):
+        log.debug(f"Preprocessing message")
+        message = str(message).encode('utf-8')
+        return struct.pack('>I', len(message)) + message
+
     def send_message(self, client_id, message):
         log.debug(f"Sending message to {client_id}")
         if client_id in self.client_list:
+            log.debug(f"Sending message to {self.client_list[client_id]['socket'].getpeername()}")
             client_socket = self.client_list[client_id]['socket']
-            client_socket.sendall(message.encode('utf-8'))
+            log.debug(f"Sending message to {client_socket}")
+            client_socket.sendall(self._preprocess_send(message))
+            log.debug(f"Message sent")
+        else:
+            log.debug(f"Client {client_id} not found in {self.client_list}")
+            raise ValueError(f"Client {client_id} not found")
+
+    def _recvall(self, n, client_socket):
+        log.debug(f"Receiving {n} bytes")
+        data = bytearray()
+        while len(data) < n:
+            log.debug(f"Receiving packet, {n - len(data)} bytes remaining")
+            packet = client_socket.recv(n - len(data))
+            if not packet:
+                return None
+            data.extend(packet)
+        return data
+
+    def _process_recv(self, client_socket):
+        log.debug(f"Processing received data")
+        raw_msglen = self._recvall(4, client_socket)
+        log.debug(f"Expected encoded size received:  {raw_msglen}")
+        if not raw_msglen:
+            return None
+        msglen = struct.unpack('>I', raw_msglen)[0]
+        log.debug(f"Decoded size: {msglen} bytes")
+        return self._recvall(msglen, client_socket)
 
     def recieve_message(self, client_id, timeout=5):
         log.debug(f"Waiting for message from {client_id}")
@@ -51,9 +86,9 @@ class TCPServer:
             client_socket = self.client_list[client_id]['socket']
             client_socket.settimeout(timeout)
             try:
-                data = client_socket.recv(1024).decode('utf-8')
+                data = self._process_recv(client_socket)
                 log.debug(f"Received message from {client_id}")
-                return data
+                return data.decode('utf-8')
             except socket.timeout:
                 log.debug(f"Timeout reached")
                 return None
@@ -62,7 +97,7 @@ class TCPServer:
         log.debug(f"Broadcasting message")
         for client in self.client_list.values():
             log.debug(f"Sending message to {client['socket'].getpeername()}")
-            client['socket'].sendall(message.encode('utf-8'))
+            client['socket'].sendall(self._preprocess_send(message))
 
     def close_client(self, client_id):
         log.debug(f"Closing client {client_id}")
@@ -86,7 +121,6 @@ class TCPServer:
             for client_id in list(self.client_list.keys()):
                 self.heartbeat_client(client_id)
                 if time.time() - self.client_list[client_id]['last_heartbeat'] > 30:
-                    # Client is non-responsive
                     dead_clients.append(client_id)
-            time.sleep(5)  # Pause between heartbeat cycles
+            time.sleep(5)
             return dead_clients

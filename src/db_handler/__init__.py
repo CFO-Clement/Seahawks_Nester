@@ -18,4 +18,3 @@ if __name__ == "__main__":
     # Fermer la connexion MongoDB
     manager.client.close()
 """
-from .db_handler import DBHandler

@@ -4,26 +4,26 @@
     <title>Connected Clients</title>
 </head>
 <body>
-    <h1>Connected Clients</h1>
-    <table>
-        <tr>
-            <th>Client ID</th>
-            <th>IP Address</th>
-            <th>Port</th>
-            <th>Status</th>
-            <th>Last Active</th>
-            <th>Details</th>
-        </tr>
-        {% for client in clients %}
-            <tr>
-                <td>{{ client.id }}</td>
-                <td>{{ client.ip }}</td>
-                <td>{{ client.port }}</td>
-                <td>{{ client.status }}</td>
-                <td>{{ client.last_active }}</td>
-                <td><a href="{{ url_for('node_detail', client_id=client.id) }}">View Details</a></td>
-            </tr>
-        {% endfor %}
-    </table>
+<h1>Connected Clients</h1>
+<table>
+    <tr>
+        <th>Client ID</th>
+        <th>IP Address</th>
+        <th>Port</th>
+        <th>Status</th>
+        <th>Last Active</th>
+        <th>Details</th>
+    </tr>
+    {% for client in clients %}
+    <tr>
+        <td>{{ client.id }}</td>
+        <td>{{ client.ip }}</td>
+        <td>{{ client.port }}</td>
+        <td>{{ client.status }}</td>
+        <td>{{ client.last_active }}</td>
+        <td><a href="{{ url_for('node_detail', client_id=client.id) }}">View Details</a></td>
+    </tr>
+    {% endfor %}
+</table>
 </body>
 </html>

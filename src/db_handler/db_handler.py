@@ -4,6 +4,7 @@ from logger import Log
 
 log = Log("db_handler")
 
+
 class DbHandler:
     def __init__(self, db_name, collection_name):
         log.debug(f"Initializing DBHandler for {db_name}.{collection_name}")
@@ -11,6 +12,7 @@ class DbHandler:
         self.db = self.client[db_name]
         self.collection = self.db[collection_name]
         log.debug(f"DBHandler initialized")
+
     def get_collector_names(self):
         log.debug(f"Getting collector names")
         collector_names = self.collection.distinct("collectorName")

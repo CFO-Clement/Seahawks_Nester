@@ -4,16 +4,16 @@
     <title>Client Information - {{ client_id }}</title>
 </head>
 <body>
-    <h1>Client Information: {{ client_id }}</h1>
-    {% if client_info %}
-        <ul>
-            {% for key, value in client_info.items() %}
-                <li><strong>{{ key }}:</strong> {{ value }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No information available for this client.</p>
-    {% endif %}
-    <a href="/">Back to Client List</a>
+<h1>Client Information: {{ client_id }}</h1>
+{% if client_info %}
+<ul>
+    {% for key, value in client_info.items() %}
+    <li><strong>{{ key }}:</strong> {{ value }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No information available for this client.</p>
+{% endif %}
+<a href="/">Back to Client List</a>
 </body>
 </html>
