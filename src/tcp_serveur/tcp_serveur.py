@@ -16,10 +16,14 @@ class TCPServer:
         self.client_list = {}
 
     def start(self):
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((self.host, self.port))
-        self.server_socket.listen(5)
-        log.info(f"Server listening on {self.host}:{self.port}")
+        try:
+            self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server_socket.bind((self.host, self.port))
+            self.server_socket.listen(5)
+            log.info(f"Server listening on {self.host}:{self.port}")
+        except Exception as e:
+            log.error(f"Error while starting server: {e}")
+            raise OSError(f"Error while starting server: {e}")
 
         while True:
             client_socket, client_address = self.server_socket.accept()
@@ -48,11 +52,9 @@ class TCPServer:
         return struct.pack('>I', len(message)) + message
 
     def send_message(self, client_id, message):
-        log.debug(f"Sending message to {client_id}")
+        log.debug(f"Sending {message} to {client_id} -> {self.client_list[client_id]['socket'].getpeername()}")
         if client_id in self.client_list:
-            log.debug(f"Sending message to {self.client_list[client_id]['socket'].getpeername()}")
             client_socket = self.client_list[client_id]['socket']
-            log.debug(f"Sending message to {client_socket}")
             client_socket.sendall(self._preprocess_send(message))
             log.debug(f"Message sent")
         else:
@@ -80,7 +82,7 @@ class TCPServer:
         log.debug(f"Decoded size: {msglen} bytes")
         return self._recvall(msglen, client_socket)
 
-    def recieve_message(self, client_id, timeout=5):
+    def recieve_message(self, client_id, timeout=5000):
         log.debug(f"Waiting for message from {client_id}")
         if client_id in self.client_list:
             client_socket = self.client_list[client_id]['socket']

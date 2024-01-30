@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NMAP Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .result-container { margin: 20px; }
+        .result-header { margin-bottom: 10px; }
+        .command { background-color: #f0f0f0; padding: 10px; }
+        .host-info, .port-info { margin-top: 10px; }
+        .port-info { margin-left: 20px; }
+    </style>
+</head>
+<body>
+<div class="result-container">
+    <div class="result-header">
+        <h1>NMAP Results</h1>
+        <p class="command">Command: <strong>{{ data.command }}</strong></p>
+    </div>
+    {% for ip, details in data.results.items() %}
+    <div class="host-info">
+        <h2>Host: {{ ip }}</h2>
+        <p>Status: {{ details.status.state }} ({{ details.status.reason }})</p>
+        <h3>Hostnames:</h3>
+        <ul>
+            {% for hostname in details.hostnames %}
+            <li>{{ hostname.name }} ({{ hostname.type }})</li>
+            {% endfor %}
+        </ul>
+        <h3>Ports:</h3>
+        {% for port, info in details.tcp.items() %}
+        <div class="port-info">
+            <p>Port: {{ port }}</p>
+            <p>State: {{ info.state }}</p>
+            <p>Service: {{ info.name }} {{ info.version }}</p>
+            <p>Details: {{ info.extrainfo }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+</body>
+</html>

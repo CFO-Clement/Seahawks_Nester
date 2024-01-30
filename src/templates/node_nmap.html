@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NMAP Node</title>
+</head>
+<body>
+<h1>NMAP Node: {{ client_id }}</h1>
+<form action="{{ url_for('run_nmap', client_id=client_id) }}" method="post">
+    <input type="text" name="command" placeholder="Enter NMAP command" required>
+    <input type="submit" value="Run NMAP">
+</form>
+</body>
+</html>

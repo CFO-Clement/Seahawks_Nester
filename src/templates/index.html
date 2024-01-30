@@ -13,6 +13,8 @@
         <th>Status</th>
         <th>Last Active</th>
         <th>Details</th>
+        <th>Send Heartbeat</th>
+        <th>NMAP</th> <!-- New column for NMAP -->
     </tr>
     {% for client in clients %}
     <tr>
@@ -22,6 +24,8 @@
         <td>{{ client.status }}</td>
         <td>{{ client.last_active }}</td>
         <td><a href="{{ url_for('node_detail', client_id=client.id) }}">View Details</a></td>
+        <td><a href="{{ url_for('send_heartbeat', client_id=client.id) }}" class="heartbeat-btn">Send Heartbeat</a></td>
+        <td><a href="{{ url_for('node_nmap', client_id=client.id) }}">NMAP</a></td>
     </tr>
     {% endfor %}
 </table>
