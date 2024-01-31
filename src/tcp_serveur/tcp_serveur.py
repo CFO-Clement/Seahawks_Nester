@@ -1,15 +1,17 @@
 import socket
-import struct
 import threading
 import time
 
 from logger import Log
 
+from .tcp_base import TCPBase
+
 log = Log("tcp_server")
 
 
-class TCPServer:
+class TCPServer(TCPBase):
     def __init__(self, host='0.0.0.0', port=5001):
+        super().__init__()
         self.host = host
         self.port = port
         self.server_socket = None
@@ -45,12 +47,6 @@ class TCPServer:
         log.debug(f"Getting client list")
         return list(self.client_list.keys())
 
-    @staticmethod
-    def _preprocess_send(message):
-        log.debug(f"Preprocessing message")
-        message = str(message).encode('utf-8')
-        return struct.pack('>I', len(message)) + message
-
     def send_message(self, client_id, message):
         log.debug(f"Sending {message} to {client_id} -> {self.client_list[client_id]['socket'].getpeername()}")
         if client_id in self.client_list:
@@ -60,27 +56,6 @@ class TCPServer:
         else:
             log.debug(f"Client {client_id} not found in {self.client_list}")
             raise ValueError(f"Client {client_id} not found")
-
-    def _recvall(self, n, client_socket):
-        log.debug(f"Receiving {n} bytes")
-        data = bytearray()
-        while len(data) < n:
-            log.debug(f"Receiving packet, {n - len(data)} bytes remaining")
-            packet = client_socket.recv(n - len(data))
-            if not packet:
-                return None
-            data.extend(packet)
-        return data
-
-    def _process_recv(self, client_socket):
-        log.debug(f"Processing received data")
-        raw_msglen = self._recvall(4, client_socket)
-        log.debug(f"Expected encoded size received:  {raw_msglen}")
-        if not raw_msglen:
-            return None
-        msglen = struct.unpack('>I', raw_msglen)[0]
-        log.debug(f"Decoded size: {msglen} bytes")
-        return self._recvall(msglen, client_socket)
 
     def recieve_message(self, client_id, timeout=5000):
         log.debug(f"Waiting for message from {client_id}")

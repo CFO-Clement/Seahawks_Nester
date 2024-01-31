@@ -2,42 +2,70 @@
 <html>
 <head>
     <title>NMAP Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        body { font-family: Arial, sans-serif; }
-        .result-container { margin: 20px; }
-        .result-header { margin-bottom: 10px; }
-        .command { background-color: #f0f0f0; padding: 10px; }
-        .host-info, .port-info { margin-top: 10px; }
-        .port-info { margin-left: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            padding-top: 20px;
+        }
+
+        .result-container {
+            padding: 20px;
+        }
+
+        .command {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-left: 3px solid #007bff;
+            font-family: monospace;
+        }
+
+        .host-info, .port-info {
+            margin-top: 20px;
+        }
+
+        .port-info {
+            padding-left: 20px;
+            border-left: 2px dotted #ccc;
+        }
+
+        h2, h3 {
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
-<div class="result-container">
-    <div class="result-header">
-        <h1>NMAP Results</h1>
-        <p class="command">Command: <strong>{{ data.command }}</strong></p>
-    </div>
-    {% for ip, details in data.results.items() %}
-    <div class="host-info">
-        <h2>Host: {{ ip }}</h2>
-        <p>Status: {{ details.status.state }} ({{ details.status.reason }})</p>
-        <h3>Hostnames:</h3>
-        <ul>
-            {% for hostname in details.hostnames %}
-            <li>{{ hostname.name }} ({{ hostname.type }})</li>
+<div class="container">
+    <div class="result-container">
+        <div class="result-header mb-4">
+            <h1>NMAP Results</h1>
+            <p class="command">Command: <strong>{{ data.command }}</strong></p>
+        </div>
+        {% for ip, details in data.results.items() %}
+        <div class="host-info">
+            <h2>Host: {{ ip }}</h2>
+            <p>Status: {{ details.status.state }} ({{ details.status.reason }})</p>
+            <h3>Hostnames:</h3>
+            <ul>
+                {% for hostname in details.hostnames %}
+                <li>{{ hostname.name }} ({{ hostname.type }})</li>
+                {% endfor %}
+            </ul>
+            <h3>Ports:</h3>
+            {% for port, info in details.tcp.items() %}
+            <div class="port-info">
+                <p>Port: {{ port }}</p>
+                <p>State: {{ info.state }}</p>
+                <p>Service: {{ info.name }} {{ info.version }}</p>
+                <p>Details: {{ info.extrainfo }}</p>
+            </div>
             {% endfor %}
-        </ul>
-        <h3>Ports:</h3>
-        {% for port, info in details.tcp.items() %}
-        <div class="port-info">
-            <p>Port: {{ port }}</p>
-            <p>State: {{ info.state }}</p>
-            <p>Service: {{ info.name }} {{ info.version }}</p>
-            <p>Details: {{ info.extrainfo }}</p>
         </div>
         {% endfor %}
     </div>
-    {% endfor %}
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

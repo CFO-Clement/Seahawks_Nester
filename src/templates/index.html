@@ -2,32 +2,65 @@
 <html>
 <head>
     <title>Connected Clients</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .heartbeat-btn, .nmap-btn {
+            color: white;
+        }
+        .heartbeat-btn {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .nmap-btn {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .heartbeat-btn:hover, .nmap-btn:hover {
+            color: white;
+            opacity: 0.85;
+        }
+    </style>
 </head>
-<body>
-<h1>Connected Clients</h1>
-<table>
-    <tr>
-        <th>Client ID</th>
-        <th>IP Address</th>
-        <th>Port</th>
-        <th>Status</th>
-        <th>Last Active</th>
-        <th>Details</th>
-        <th>Send Heartbeat</th>
-        <th>NMAP</th> <!-- New column for NMAP -->
-    </tr>
-    {% for client in clients %}
-    <tr>
-        <td>{{ client.id }}</td>
-        <td>{{ client.ip }}</td>
-        <td>{{ client.port }}</td>
-        <td>{{ client.status }}</td>
-        <td>{{ client.last_active }}</td>
-        <td><a href="{{ url_for('node_detail', client_id=client.id) }}">View Details</a></td>
-        <td><a href="{{ url_for('send_heartbeat', client_id=client.id) }}" class="heartbeat-btn">Send Heartbeat</a></td>
-        <td><a href="{{ url_for('node_nmap', client_id=client.id) }}">NMAP</a></td>
-    </tr>
-    {% endfor %}
-</table>
+<body class="container">
+    <h1>Connected Clients</h1>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Client ID</th>
+                    <th>IP Address</th>
+                    <th>Port</th>
+                    <th>Status</th>
+                    <th>Last Active</th>
+                    <th>Details</th>
+                    <th>Send Heartbeat</th>
+                    <th>NMAP</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.id }}</td>
+                    <td>{{ client.ip }}</td>
+                    <td>{{ client.port }}</td>
+                    <td>{{ client.status }}</td>
+                    <td>{{ client.last_active }}</td>
+                    <td><a class="btn btn-info" href="{{ url_for('node_detail', client_id=client.id) }}">View Details</a></td>
+                    <td><a class="btn heartbeat-btn" href="{{ url_for('send_heartbeat', client_id=client.id) }}">Send Heartbeat</a></td>
+                    <td><a class="btn nmap-btn" href="{{ url_for('node_nmap', client_id=client.id) }}">NMAP</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

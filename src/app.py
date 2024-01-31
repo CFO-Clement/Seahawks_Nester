@@ -17,9 +17,11 @@ def index():
         'ip': server.client_list[client_id]['socket'].getpeername()[0],
         'port': server.client_list[client_id]['socket'].getpeername()[1],
         'status': 'Active',
-        'last_active': server.client_list[client_id]['last_active'] if 'last_active' in server.client_list[client_id] else 'Never'
+        'last_active': server.client_list[client_id]['last_active'] if 'last_active' in server.client_list[
+            client_id] else 'Never'
     } for client_id in server.client_list]
     return render_template('index.html', clients=client_data)
+
 
 @app.route('/send_heartbeat/<client_id>')
 def send_heartbeat(client_id):
@@ -34,6 +36,7 @@ def send_heartbeat(client_id):
         flash('Node not found', 'danger')
     return redirect(url_for('index'))
 
+
 @app.route('/node/<client_id>')
 def node_detail(client_id):
     if client_id in server.client_list:
@@ -42,6 +45,7 @@ def node_detail(client_id):
         return render_template('node_detail.html', data=json.loads(data))
     else:
         return 'Node not found', 404
+
 
 @app.route('/node_nmap/<client_id>')
 def node_nmap(client_id):
@@ -77,5 +81,5 @@ if __name__ == '__main__':
         sleep(1)
         exit(0)
     else:
-        #pass
+        # pass
         app.run(debug=False)
