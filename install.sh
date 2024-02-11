@@ -4,17 +4,18 @@ ENV_FILE="./config.env"
 
 configure_env() {
     read -p "Entrez une cles secrete pour la signature des cookies (SECRET_KEY)" SECRET_KEY
-    read -p "Entrez l'ip d' ecoute de Flask (FLASK_EXPOSED_IP)" FLASK_EXPOSED_IP
+    read -p "Entrez l'ip d' ecoute de Flask (FLASK_EXPOSED_IP)" FLASK_LISTEN_IP
     read -p "Entrez le port d' ecoute de Flask (FLASK_LISTEN_PORT)" FLASK_LISTEN_PORT
     read -p "Entrez l' ip d'ecoute du Nester(NESTER_LISTEN_IP)" NESTER_LISTEN_IP
     read -p "Entrez le port d'ecoute du Nester (NESTER_LISTEN_PORT)" NESTER_LISTEN_PORT
 
 
     echo "SECRET_KEY=${SECRET_KEY}" > ${ENV_FILE}
-    echo "FLASK_EXPOSED_IP=${FLASK_EXPOSED_IP}" >> ${ENV_FILE}
+    echo "FLASK_LISTEN_IP=${FLASK_LISTEN_IP}" >> ${ENV_FILE}
     echo "FLASK_LISTEN_PORT=${FLASK_LISTEN_PORT}" >> ${ENV_FILE}
     echo "NESTER_LISTEN_IP=${NESTER_LISTEN_IP}" >> ${ENV_FILE}
     echo "NESTER_LISTEN_PORT=${NESTER_LISTEN_PORT}" >> ${ENV_FILE}
+    echo "" >> ${ENV_FILE}
 
     main
 }

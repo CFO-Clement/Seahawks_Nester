@@ -5,16 +5,17 @@ set ENV_FILE=./config.env
 
 :configure_env
 set /p SECRET_KEY=Entrez une cles secrete pour la signature des cookies (SECRET_KEY):
-set /p FLASK_EXPOSE_IP=Entrez l' ip d'ecoute de Flask (FLASK_EXPOSE_IP):
+set /p FLASK_LISTEN_IP=Entrez l' ip d'ecoute de Flask (FLASK_LISTEN_IP):
 set /p FLASK_LISTEN_PORT=Entrez le port d'ecoute de Flask (FLASK_LISTEN_PORT):
 set /p NESTER_LISTEN_IP=Entrez l' ip d'ecoute du Nester(NESTER_LISTEN_IP):
 set /p NESTER_LISTEN_PORT=Entrez le port d'ecoute du Nester(NESTER_LISTEN_PORT):
 
 echo SECRET_KEY=!SECRET_KEY! >> %ENV_FILE%
-echo FLASK_EXPOSE_IP=!FLASK_EXPOSE_IP! >> %ENV_FILE%
+echo FLASK_LISTEN_IP=!FLASK_LISTEN_IP! >> %ENV_FILE%
 echo FLASK_LISTEN_PORT=!FLASK_LISTEN_PORT! >> %ENV_FILE%
 echo NESTER_LISTEN_IP=!NESTER_LISTEN_IP! >> %ENV_FILE%
 echo NESTER_LISTEN_PORT=!NESTER_LISTEN_PORT! >> %ENV_FILE%
+echo "" >> %ENV_FILE%
 
 goto main
 
