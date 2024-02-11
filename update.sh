@@ -34,6 +34,7 @@ check_for_update() {
 }
 
 update_project() {
+    git stash
     if git pull; then
         echo "Le projet a été mis à jour avec succès."
     else
