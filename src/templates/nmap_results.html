@@ -37,33 +37,67 @@
 <body>
 <div class="container">
     <div class="result-container">
+        <a href="/" class="btn btn-primary">Retour</a>
         <div class="result-header mb-4">
             <h1>NMAP Results</h1>
             <p class="command">Command: <strong>{{ data.command }}</strong></p>
         </div>
-        {% for ip, details in data.results.items() %}
-        <div class="host-info">
-            <h2>Host: {{ ip }}</h2>
-            <p>Status: {{ details.status.state }} ({{ details.status.reason }})</p>
-            <h3>Hostnames:</h3>
-            <ul>
-                {% for hostname in details.hostnames %}
-                <li>{{ hostname.name }} ({{ hostname.type }})</li>
-                {% endfor %}
-            </ul>
-            <h3>Ports:</h3>
-            {% for port, info in details.tcp.items() %}
-            <div class="port-info">
-                <p>Port: {{ port }}</p>
-                <p>State: {{ info.state }}</p>
-                <p>Service: {{ info.name }} {{ info.version }}</p>
-                <p>Details: {{ info.extrainfo }}</p>
-            </div>
+        {% if data.results is defined %}
+            {% for ip, details in data.results.items() %}
+                <div class="host-info">
+                    <h2>Host: {{ ip }}</h2>
+                    <p>Status: {{ details.status.state }} ({{ details.status.reason }})</p>
+                    {% if details.hostnames %}
+                        <h3>Hostnames:</h3>
+                        <ul>
+                            {% for hostname in details.hostnames %}
+                                <li>{{ hostname.name }} ({{ hostname.type }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if details.tcp %}
+                        <h3>TCP Ports:</h3>
+                        {% for port, info in details.tcp.items() %}
+                            <div class="port-info">
+                                <p>Port: {{ port }}</p>
+                                <p>State: {{ info.state }}</p>
+                                <p>Service: {{ info.name }} {{ info.version }}</p>
+                                <p>Details: {{ info.extrainfo }}</p>
+                                {% if info.script %}
+                                    <p>Script Results:</p>
+                                    <ul>
+                                        {% for script, output in info.script.items() %}
+                                            <li>{{ script }}: {{ output }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% if details.udp %}
+                        <h3>UDP Ports:</h3>
+                        {% for port, info in details.udp.items() %}
+                            <div class="port-info">
+                                <p>Port: {{ port }}</p>
+                                <p>State: {{ info.state }}</p>
+                                <p>Service: {{ info.name }} {{ info.version }}</p>
+                                <p>Details: {{ info.extrainfo }}</p>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             {% endfor %}
-        </div>
-        {% endfor %}
+        {% else %}
+            <div class="result-container">
+                <h2>Unhandled Data Format</h2>
+                <p>The data returned from the scan does not match the expected format. Raw data is shown below for
+                    debugging purposes.</p>
+                <pre>{{ data | tojson }}</pre>
+            </div>
+        {% endif %}
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

@@ -10,8 +10,8 @@ log = Log("tcp_server")
 
 
 class TCPServer(TCPBase):
-    def __init__(self, host='0.0.0.0', port=5001):
-        super().__init__()
+    def __init__(self, host, port, stop_event):
+        super().__init__(stop_event)
         self.host = host
         self.port = port
         self.server_socket = None
@@ -25,14 +25,19 @@ class TCPServer(TCPBase):
             log.info(f"Server listening on {self.host}:{self.port}")
         except Exception as e:
             log.error(f"Error while starting server: {e}")
-            raise OSError(f"Error while starting server: {e}")
+            self._critical_fail(f"Error while starting server: {e}")
 
         while True:
-            client_socket, client_address = self.server_socket.accept()
-            log.info(f"New connection from {client_address}")
-            client_id = self._process_recv(client_socket).decode('utf-8')
-            client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_id))
-            client_thread.start()
+            try:
+                client_socket, client_address = self.server_socket.accept()
+                log.info(f"New connection from {client_address}")
+                client_id = self._process_recv(client_socket).decode('utf-8')
+                client_thread = threading.Thread(target=self.handle_client, args=(client_socket, client_id))
+                client_thread.start()
+            except OSError as e:
+                log.error(f"Error while accepting client: {e}")
+                self._critical_fail(f"Error while accepting client: {e}")
+                return
 
     def handle_client(self, client_socket, client_id):
         log.debug(f"Handling client {client_id}")
@@ -54,8 +59,7 @@ class TCPServer(TCPBase):
             client_socket.sendall(self._preprocess_send(message))
             log.debug(f"Message sent")
         else:
-            log.debug(f"Client {client_id} not found in {self.client_list}")
-            raise ValueError(f"Client {client_id} not found")
+            log.error(f"Client {client_id} not found in {self.client_list}")
 
     def recieve_message(self, client_id, timeout=5000):
         log.debug(f"Waiting for message from {client_id}")
@@ -65,9 +69,13 @@ class TCPServer(TCPBase):
             try:
                 data = self._process_recv(client_socket)
                 log.debug(f"Received message from {client_id}")
-                return data.decode('utf-8')
+                data = data.decode('utf-8')
+                return data
             except socket.timeout:
-                log.debug(f"Timeout reached")
+                log.warning(f"Timeout reached")
+                return None
+            except Exception:
+                log.warning(f"Exception occurred, empty message ?")
                 return None
 
     def broadcast_message(self, message):
@@ -79,25 +87,33 @@ class TCPServer(TCPBase):
     def close_client(self, client_id):
         log.debug(f"Closing client {client_id}")
         if client_id in self.client_list:
+            self.send_message(client_id, 'CLOSE')
             self.client_list[client_id]['socket'].close()
             del self.client_list[client_id]
 
     def heartbeat_client(self, client_id):
-        log.debug(f"Heartbeating client {client_id}")
         if client_id in self.client_list:
             try:
                 self.client_list[client_id]['socket'].sendall(b'HEARTBEAT')
-                # Update the last heartbeat time
                 self.client_list[client_id]['last_heartbeat'] = time.time()
             except socket.error:
                 self.close_client(client_id)
 
-    def start_heartbeats(self):
+    def handle_heartbeats(self):
         dead_clients = []
         while True:
             for client_id in list(self.client_list.keys()):
                 self.heartbeat_client(client_id)
-                if time.time() - self.client_list[client_id]['last_heartbeat'] > 30:
+                if time.time() - self.client_list[client_id]['last_heartbeat'] > 120:
                     dead_clients.append(client_id)
-            time.sleep(5)
-            return dead_clients
+            time.sleep(30)
+            if dead_clients:
+                log.error(f"Dead client(s) detected: {dead_clients}")
+                dead_clients = []
+
+    def start_heartbeat_thread(self):
+        log.debug(f"Starting heartbeat thread")
+        heartbeat_thread = threading.Thread(target=self.handle_heartbeats)
+        heartbeat_thread.start()
+        log.debug(f"Heartbeat thread started")
+        return heartbeat_thread

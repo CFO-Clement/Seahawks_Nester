@@ -1,14 +1,37 @@
 import json
-from time import sleep
+import os
+import threading
+
+from datetime import datetime
+from time import sleep, time
+from dotenv import load_dotenv
 
 from flask import Flask, render_template, redirect, url_for, flash, request
 
 from tcp_serveur import TCPServer
+from logger import Log
+
+log = Log("main")
+
+log.info("Loading environment")
+script_dir = os.path.dirname(__file__)
+log.debug(f"script_dir: {script_dir}")
+env_path = os.path.join(script_dir, '../config.env')
+log.debug(f"env_path: {env_path}")
+load_dotenv(env_path)
+
+NESTER_LISTEN_IP = os.getenv('NESTER_LISTEN_IP')
+NESTER_LISTEN_PORT = int(os.getenv('NESTER_LISTEN_PORT'))
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+FLASK_EXPOSE_IP = os.getenv('FLASK_LISTEN_IP')
+FLASK_EXPOSE_PORT = int(os.getenv('FLASK_LISTEN_PORT'))
 
 app = Flask(__name__, template_folder='templates')
-app.secret_key = 'une_cle_secrete_tres_complexe'
-server = TCPServer()
+app.secret_key = SECRET_KEY
 
+stop_event = threading.Event()
+server = TCPServer(NESTER_LISTEN_IP, NESTER_LISTEN_PORT, stop_event)
 
 @app.route('/')
 def index():
@@ -17,8 +40,8 @@ def index():
         'ip': server.client_list[client_id]['socket'].getpeername()[0],
         'port': server.client_list[client_id]['socket'].getpeername()[1],
         'status': 'Active',
-        'last_active': server.client_list[client_id]['last_active'] if 'last_active' in server.client_list[
-            client_id] else 'Never'
+        'last_active': datetime.fromtimestamp(server.client_list[client_id]['last_heartbeat']).strftime('%Y-%m-%d %H:%M:%S')
+                if 'last_heartbeat' in server.client_list[client_id] else 'Never'
     } for client_id in server.client_list]
     return render_template('index.html', clients=client_data)
 
@@ -60,7 +83,10 @@ def run_nmap(client_id):
     if client_id not in server.client_list:
         return 'Node not found', 404
 
-    command = request.form['command']
+    target = request.form['target']
+    predefined = request.form['predefined_command'].replace('+', ' ')
+    custom = request.form['custom_command']
+    command = f"NMAP {predefined} {target}" if predefined else f"NMAP {custom}"
     server.send_message(client_id, command)
     data = server.recieve_message(client_id)
 
@@ -72,14 +98,20 @@ def run_nmap(client_id):
 
 
 if __name__ == '__main__':
+    log.info(f"Starting server on {NESTER_LISTEN_IP}:{NESTER_LISTEN_PORT}")
     try:
         server.run_server()
         sleep(1)
+        if stop_event.is_set():
+            log.critical("Server failed to start")
+            raise Exception("Server failed to start")
+        server.start_heartbeat_thread()
+        app.run(debug=False, host=FLASK_EXPOSE_IP, port=FLASK_EXPOSE_PORT)
     except Exception as e:
-        print('Server stopping...')
-        server.broadcast_message('KILL')
+        log.critical(f"Unhandled exception: {e}")
+        log.warning("Closing server and exiting")
+        server.broadcast_message('CLOSE')
+        server._critical_fail("Unhandled exception")
         sleep(1)
-        exit(0)
-    else:
-        # pass
-        app.run(debug=False)
+        exit(1)
+
