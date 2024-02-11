@@ -1,0 +1,42 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class Log {
+            lock : lock
+            logger : Logger, RootLogger, NoneType
+            critical(message)
+            debug(message)
+            error(message)
+            info(message)
+            log(level, message)
+            warning(message)
+          }
+          class TCPBase {
+            socket : NoneType
+            stop_event
+          }
+          class TCPServer {
+            client_list : dict
+            host
+            port
+            server_socket : socket, NoneType
+            broadcast_message(message)
+            close_client(client_id)
+            get_client_list()
+            handle_client(client_socket, client_id)
+            handle_heartbeats()
+            heartbeat_client(client_id)
+            recieve_message(client_id, timeout)
+            run_server()
+            send_message(client_id, message)
+            start()
+            start_heartbeat_thread()
+          }
+          TCPServer --|> TCPBase
+  
+       </div>
+  </body>
+</html>

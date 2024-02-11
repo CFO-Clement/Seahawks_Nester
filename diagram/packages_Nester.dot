@@ -1,0 +1,18 @@
+digraph "packages_Nester" {
+rankdir=BT
+charset="utf-8"
+"app" [color="aliceblue", label=<app>, shape="box", style="filled"];
+"logger" [color="antiquewhite", label=<logger>, shape="box", style="filled"];
+"logger.logger" [color="antiquewhite", label=<logger.logger>, shape="box", style="filled"];
+"tcp_serveur" [color="aquamarine", label=<tcp_serveur>, shape="box", style="filled"];
+"tcp_serveur.tcp_base" [color="aquamarine", label=<tcp_serveur.tcp_base>, shape="box", style="filled"];
+"tcp_serveur.tcp_serveur" [color="aquamarine", label=<tcp_serveur.tcp_serveur>, shape="box", style="filled"];
+"app" -> "logger" [arrowhead="open", arrowtail="none"];
+"app" -> "tcp_serveur" [arrowhead="open", arrowtail="none"];
+"logger" -> "logger" [arrowhead="open", arrowtail="none"];
+"tcp_serveur" -> "tcp_serveur" [arrowhead="open", arrowtail="none"];
+"tcp_serveur" -> "tcp_serveur.tcp_base" [arrowhead="open", arrowtail="none"];
+"tcp_serveur.tcp_base" -> "logger" [arrowhead="open", arrowtail="none"];
+"tcp_serveur.tcp_serveur" -> "logger" [arrowhead="open", arrowtail="none"];
+"tcp_serveur.tcp_serveur" -> "tcp_serveur.tcp_base" [arrowhead="open", arrowtail="none"];
+}

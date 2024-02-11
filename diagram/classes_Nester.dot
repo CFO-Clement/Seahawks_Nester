@@ -1,0 +1,8 @@
+digraph "classes_Nester" {
+rankdir=BT
+charset="utf-8"
+"logger.logger.Log" [color="antiquewhite", fontcolor="black", label=<{Log|lock : lock<br ALIGN="LEFT"/>logger : RootLogger, NoneType, Logger<br ALIGN="LEFT"/>|critical(message)<br ALIGN="LEFT"/>debug(message)<br ALIGN="LEFT"/>error(message)<br ALIGN="LEFT"/>info(message)<br ALIGN="LEFT"/>log(level, message)<br ALIGN="LEFT"/>warning(message)<br ALIGN="LEFT"/>}>, shape="record", style="filled"];
+"tcp_serveur.tcp_base.TCPBase" [color="aquamarine", fontcolor="black", label=<{TCPBase|socket : NoneType<br ALIGN="LEFT"/>stop_event<br ALIGN="LEFT"/>|}>, shape="record", style="filled"];
+"tcp_serveur.tcp_serveur.TCPServer" [color="aquamarine", fontcolor="black", label=<{TCPServer|client_list : dict<br ALIGN="LEFT"/>host<br ALIGN="LEFT"/>port<br ALIGN="LEFT"/>server_socket : socket, NoneType<br ALIGN="LEFT"/>|broadcast_message(message)<br ALIGN="LEFT"/>close_client(client_id)<br ALIGN="LEFT"/>get_client_list()<br ALIGN="LEFT"/>handle_client(client_socket, client_id)<br ALIGN="LEFT"/>handle_heartbeats()<br ALIGN="LEFT"/>heartbeat_client(client_id)<br ALIGN="LEFT"/>recieve_message(client_id, timeout)<br ALIGN="LEFT"/>run_server()<br ALIGN="LEFT"/>send_message(client_id, message)<br ALIGN="LEFT"/>start()<br ALIGN="LEFT"/>start_heartbeat_thread()<br ALIGN="LEFT"/>}>, shape="record", style="filled"];
+"tcp_serveur.tcp_serveur.TCPServer" -> "tcp_serveur.tcp_base.TCPBase" [arrowhead="empty", arrowtail="none"];
+}
