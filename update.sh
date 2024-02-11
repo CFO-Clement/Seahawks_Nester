@@ -6,7 +6,7 @@ check_for_update() {
     # Charger la version locale
     if [ -f "config.env" ]; then
         local_version_line=$(cat config.env | grep 'VERSION=')
-        local_version=$(echo $local_version_line | cut -d '=' -f2)
+        local_version=$(echo $local_version_line | cut -d ' = ' -f2)
     else
         echo "Fichier config.env local introuvable. Impossible de vérifier la version actuelle."
         return 1
