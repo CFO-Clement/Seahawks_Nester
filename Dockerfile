@@ -1,5 +1,5 @@
 FROM python:3.11-slim
-ARG NESTER_PORT
+ARG NESTER_LISTEN_PORT
 ARG FLASK_PORT
 WORKDIR .
 
@@ -12,6 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY config.env config.env
 
 COPY /src /src
-EXPOSE $NESTER_PORT
-EXPOSE $FLASK_PORT
+EXPOSE $NESTER_LISTEN_PORT
+EXPOSE $FLASK_LISTEN_PORT
 CMD ["python", "./src/app.py"]

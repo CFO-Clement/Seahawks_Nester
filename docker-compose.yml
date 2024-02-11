@@ -1,7 +1,12 @@
 version: '3.8'
 services:
   harvester:
-    build: .
+    build:
+        context: .
+        dockerfile: Dockerfile
+        args:
+            - NESTER_LISTEN_PORT=${NESTER_LISTEN_PORT}
+            - FLASK_LISTEN_PORT=${FLASK_LISTEN_PORT}
     volumes:
       - .:/app
     env_file:
