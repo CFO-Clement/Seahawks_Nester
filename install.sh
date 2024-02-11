@@ -24,7 +24,7 @@ build_compose() {
 }
 
 build_dockerfile() {
-    sudo docker build --build-arg NESTER_PORT=${NESTER_PORT} FLASK_PORT=${FLASK_LISTEN_PORT} -t nester_image .
+    sudo docker build --build-arg NESTER_LISTEN_PORT=${NESTER_LISTEN_PORT} FLASK_LISTEN_PORT=${FLASK_LISTEN_PORT} -t nester_image .
 }
 
 main() {

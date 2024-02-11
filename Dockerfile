@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 ARG NESTER_LISTEN_PORT
-ARG FLASK_PORT
+ARG FLASK_LISTEN_PORT
 WORKDIR .
 
 RUN apt-get update && apt-get install -y \

@@ -37,6 +37,7 @@ if not "%remote_version%"=="" (
 exit /b
 
 :update_project
+git stash
 if git pull (
     echo Le projet a été mis à jour avec succès.
 ) else (

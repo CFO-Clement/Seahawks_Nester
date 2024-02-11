@@ -23,7 +23,7 @@ docker-compose --env-file %ENV_FILE% build
 goto :eof
 
 :build_dockerfile
-docker build --build-arg NESTER_PORT=!NESTER_PORT! FLAK_PORT=!FLASK_LISTEN_PORT! -t nester_image .
+docker build --build-arg NESTER_LISTEN_PORT=!NESTER_LISTEN_PORT! FLASK_LISTEN_PORT=!FLASK_LISTEN_PORT! -t nester_image .
 goto :eof
 
 :main
