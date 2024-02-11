@@ -8,4 +8,4 @@ services:
       - config.env
     ports:
         - "${NESTER_LISTEN_PORT}:${NESTER_LISTEN_PORT}"
-        - "{FLASK_LISTEN_PORT}:${FLASK_LISTEN_PORT}"
+        - "${FLASK_LISTEN_PORT}:${FLASK_LISTEN_PORT}"
