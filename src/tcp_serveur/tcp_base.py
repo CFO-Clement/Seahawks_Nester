@@ -29,6 +29,7 @@ class TCPBase:
         """
         log.debug(f"Preprocessing message")
         message = str(message).encode('utf-8')
+        log.debug(f"Message preprocessed: {message} -> {struct.pack('>I', len (message)) + message}")
         return struct.pack('>I', len(message)) + message
 
     def _recvall(self, n, sock):
@@ -44,7 +45,9 @@ class TCPBase:
             packet = sock.recv(n - len(data))
             if not packet:
                 return None
+            log.debug(f"Received chunk: {packet}")
             data.extend(packet)
+        log.debug(f"Received {data}")
         return data
 
     def _process_recv(self, sock):
@@ -55,9 +58,11 @@ class TCPBase:
         """
         log.debug(f"Processing received data")
         raw_msglen = self._recvall(4, sock)
+        log.debug(f"Received raw message length: {raw_msglen}")
         if not raw_msglen:
             return None
         msglen = struct.unpack('>I', raw_msglen)[0]
+        log.debug(f"Received message length: {msglen}")
         return self._recvall(msglen, sock)
 
     def _critical_fail(self, message):

@@ -70,6 +70,7 @@ class TCPServer(TCPBase):
                 data = self._process_recv(client_socket)
                 log.debug(f"Received message from {client_id}")
                 data = data.decode('utf-8')
+                log.debug(f"Decoded message: {data}")
                 return data
             except socket.timeout:
                 log.warning(f"Timeout reached")
@@ -94,7 +95,7 @@ class TCPServer(TCPBase):
     def heartbeat_client(self, client_id):
         if client_id in self.client_list:
             try:
-                self.client_list[client_id]['socket'].sendall(b'HEARTBEAT')
+                self.client_list[client_id]['socket'].sendall(self._preprocess_send('HEARTBEAT'))
                 self.client_list[client_id]['last_heartbeat'] = time.time()
             except socket.error:
                 self.close_client(client_id)
