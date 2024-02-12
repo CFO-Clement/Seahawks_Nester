@@ -105,7 +105,7 @@ if __name__ == '__main__':
         if stop_event.is_set():
             log.critical("Server failed to start")
             raise Exception("Server failed to start")
-        server.start_heartbeat_thread()
+        #server.start_heartbeat_thread()
         app.run(debug=False, host=FLASK_EXPOSE_IP, port=FLASK_EXPOSE_PORT)
     except Exception as e:
         log.critical(f"Unhandled exception: {e}")
