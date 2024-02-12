@@ -27,6 +27,7 @@ else
     echo "Bienvenue dans le script de démarrage"
     echo "1. Démarrer avec Docker Compose"
     echo "2. Démarrer avec Docker"
+    echo "3. Mettre à jour"
     read -p "Choisissez une option: " choice
 
     case $choice in
@@ -35,6 +36,10 @@ else
             ;;
         2)
             start_docker
+            ;;
+        3)
+            ./update.sh
+            ./install.sh
             ;;
         *)
             echo "Option invalide."
